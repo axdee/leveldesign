@@ -26,7 +26,7 @@ class level
 public:
 	Box createGround(float x, float y, float width, float height, sf::Color color);
 	Box createBox(float x, float y, float width, float height, float density, float friction, sf::Color color);
-	Circle createCircle(float x, float y, float radius, float density, float friction, sf::Color color);
+	Circle createcircle(float x, float y, float radius, float density, float friction, sf::Color color);
 };	
 
 Box level::createBox(float x, float y, float width, float height, float density, float friction, sf::Color color)
@@ -73,7 +73,7 @@ Box level::createGround(float x, float y, float width, float height, sf::Color c
 }
 
 
-Circle level::createCircle(float x, float y, float radius, float density, float friction, sf::Color color)
+Circle level::createcircle(float x, float y, float radius, float density, float friction, sf::Color color)
 {
 	// Body definition
 	b2BodyDef boxBodyDef;
@@ -99,27 +99,3 @@ Circle level::createCircle(float x, float y, float radius, float density, float 
 	return Circle{ radius, color, circle };
 }
 
-Box level::createBox(float x, float y, float width, float height, float density, float friction, sf::Color color)
-{
-	// Body definition
-	b2BodyDef boxBodyDef;
-	boxBodyDef.position.Set(x / PPM, y / PPM);
-	boxBodyDef.type = b2_dynamicBody;
-
-	// Shape definition
-	b2PolygonShape boxShape;
-	boxShape.SetAsBox(width / 2 / PPM, height / 2 / PPM);
-
-	// Fixture definition
-	b2FixtureDef fixtureDef;
-	fixtureDef.density = density;
-	fixtureDef.friction = friction;
-	fixtureDef.shape = &boxShape;
-
-	// Now we have a body for our Box object
-	b2Body* boxBody = world.CreateBody(&boxBodyDef);
-	// Lastly, assign the fixture
-	boxBody->CreateFixture(&fixtureDef);
-
-	return Box{ width, height, color, boxBody };
-}
