@@ -1,0 +1,2 @@
+#define PPM 30.0F
+#define DEG_PER_RAD 57.2957795F
