@@ -1,7 +1,7 @@
 #include<SFML/Graphics.hpp>
 #include<box2d/box2d.h>
 #include"values.h"
-b2World world(b2Vec2(0, -9.8));
+b2World world(b2Vec2(0,-9));
 
 const struct Box
 {
@@ -27,7 +27,7 @@ public:
 	Box createGround(float x, float y, float width, float height, sf::Color color);
 	Box createBox(float x, float y, float width, float height, float density, float friction, sf::Color color);
 	Circle createcircle(float x, float y, float radius, float density, float friction, sf::Color color);
-	void rendercircle(sf::RenderWindow& w, std::vector<Box>& circles);
+	void rendercircle(sf::RenderWindow& w, std::vector<Circle>& circles);
 	void render(sf::RenderWindow& w, std::vector<Box>& boxes);
 };	
 
@@ -84,7 +84,7 @@ Circle level::createcircle(float x, float y, float radius, float density, float 
 
 	// Shape definition
 	b2CircleShape circle;
-	circle.m_p(radius / 2 / PPM);
+	circle.m_p(radius / PPM);
 	circle.m_radius = radius;
 
 	// Fixture definition
@@ -101,7 +101,7 @@ Circle level::createcircle(float x, float y, float radius, float density, float 
 	return Circle{ radius, color, boxBody };
 }
 
-void level::rendercircle(sf::RenderWindow& w, std::vector<Box>& circles)
+void level::rendercircle(sf::RenderWindow& w, std::vector<Circle>& circles)
 {
 	for (const auto& circle : circles)
 	{
@@ -111,23 +111,20 @@ void level::rendercircle(sf::RenderWindow& w, std::vector<Box>& circles)
 		circ.setPosition(circle.body->GetPosition().x * PPM, WINDOW_HEIGHT - (circle.body->GetPosition().y * PPM));
 
 
-		circ.setOrigin(circle.width / 2, circle.width / 2);
+		circ.setOrigin(circle.radius , circle.radius );
 
-
-
-
-		circ.setRotation(-1 * circle.body->GetAngle() * DEG_PER_RAD);
+		circ.setRadius(circle.radius);
 
 		circ.setFillColor(circle.color);
 		w.draw(circ);
 	}
-	w.display();
+	
 }
 
 void level::render(sf::RenderWindow& w, std::vector<Box>& boxes)
 {
 
-	w.clear();
+	
 	for (const auto& box : boxes)
 	{
 		sf::RectangleShape rect;
@@ -140,8 +137,6 @@ void level::render(sf::RenderWindow& w, std::vector<Box>& boxes)
 
 		rect.setSize(sf::Vector2f(box.width, box.height));
 
-		
-		rect.setRotation(-1 * box.body->GetAngle() * DEG_PER_RAD);
 
 		rect.setFillColor(box.color);
 		w.draw(rect);
@@ -149,7 +144,7 @@ void level::render(sf::RenderWindow& w, std::vector<Box>& boxes)
 
 
 
-	w.display();
+	
 }
 
 
@@ -165,27 +160,21 @@ int main()
 
 	
 	std::vector<Box> boxes;
-	std::vector<Box> circles;
+	std::vector<Circle> circles;
 
+	auto&& box = l1.createBox(400,400, 15, 15, 1.f, 0.4f, sf::Color::Red);
+	boxes.push_back(box);
 	
-	boxes.push_back(l1.createGround(300, 20, 1000, 100, sf::Color::Magenta));
-	auto&& circi = l1.createcircle(100,200,20, 1.f, 0.7f, sf::Color::Red);
+	boxes.push_back(l1.createGround(300, 50, 1000, 100, sf::Color::Magenta));
+	boxes.push_back(l1.createGround(350, 300, 100, 20, sf::Color::Magenta));
+	
+	auto&& circi = l1.createcircle(440,440,20, 1.f, 0.7f, sf::Color::Red);
 	circles.push_back(circi);
 
 	while (w.isOpen())
 	{
 		sf::Event evnt;
 
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-		{
-
-			float localPositionx = sf::Mouse::getPosition(w).x;
-			float localPositiony = sf::Mouse::getPosition(w).y;
-
-			auto&& box = l1.createBox(localPositionx, WINDOW_HEIGHT - localPositiony, 15.f, 15.f, 1.f, 0.7f, sf::Color::Red);
-			boxes.push_back(box);
-
-		}
 		while (w.pollEvent(evnt))
 		{
 			switch (evnt.type) {
@@ -201,12 +190,13 @@ int main()
 		}
 
 		// Update the world, standard arguments
-		world.Step(1 / 60.f, 6, 3);
+		//world.Step(1 / 60.f, 6, 3);
 		
 		// Render everything
+		
 		l1.render(w, boxes);
 		l1.rendercircle(w, circles);
-		
+		w.display();
 
 
 	}
