@@ -27,8 +27,11 @@ public:
 	Box createGround(float x, float y, float width, float height, sf::Color color);
 	Box createBox(float x, float y, float width, float height, float density, float friction, sf::Color color);
 	Circle createcircle(float x, float y, float radius, float density, float friction, sf::Color color);
+	void drawcircle(sf::RenderWindow& w, float x, float y, float radius, float density, float friction, sf::Color color);
 	void rendercircle(sf::RenderWindow& w, std::vector<Circle>& circles);
 	void render(sf::RenderWindow& w, std::vector<Box>& boxes);
+	void fixedpart(sf::RenderWindow& w);
+	void rectangledraw(sf::RenderWindow& w,float x, float y, float width, float height, float density, float friction, sf::Color color);
 };	
 
 Box level::createBox(float x, float y, float width, float height, float density, float friction, sf::Color color)
@@ -101,6 +104,17 @@ Circle level::createcircle(float x, float y, float radius, float density, float 
 	return Circle{ radius, color, boxBody };
 }
 
+void level::drawcircle(sf::RenderWindow& w, float x, float y, float radius, float density, float friction, sf::Color color)
+{
+	std::vector<Circle> circles;
+	auto&& circi = createcircle(x, y, radius, density, friction, color);
+	circles.push_back(circi);
+
+	rendercircle(w, circles);
+}
+
+
+
 void level::rendercircle(sf::RenderWindow& w, std::vector<Circle>& circles)
 {
 	for (const auto& circle : circles)
@@ -140,14 +154,28 @@ void level::render(sf::RenderWindow& w, std::vector<Box>& boxes)
 
 		rect.setFillColor(box.color);
 		w.draw(rect);
-	}
-
-
-
-	
+	}	
 }
 
+void level::fixedpart(sf::RenderWindow& w)
+{
+	std::vector<Box> boxes;
+	boxes.push_back(createGround(WINDOW_WIDTH / 2, 10, WINDOW_WIDTH, 100, sf::Color::Magenta));
+	boxes.push_back(createGround(WINDOW_WIDTH / 2, WINDOW_HEIGHT - 10, WINDOW_WIDTH, 100, sf::Color::Magenta));
+	boxes.push_back(createGround(10, 300, 100, WINDOW_HEIGHT, sf::Color::Magenta));
+	boxes.push_back(createGround(WINDOW_WIDTH - 10, 300, 100, WINDOW_WIDTH, sf::Color::Magenta));
 
+	boxes.push_back(createGround(450, 300, 175, 20, sf::Color::Magenta));
+	render(w, boxes);
+}
+
+void level::rectangledraw(sf::RenderWindow& w,float x, float y, float width, float height, float density, float friction, sf::Color color)
+{
+	std::vector<Box> boxes;
+	auto&& box = createBox(x, y, width, height, density, friction, color);
+	boxes.push_back(box);
+	render(w, boxes);
+}
 
 int main()
 {
@@ -165,11 +193,15 @@ int main()
 	auto&& box = l1.createBox(400,400, 15, 15, 1.f, 0.4f, sf::Color::Red);
 	boxes.push_back(box);
 	
-	boxes.push_back(l1.createGround(300, 50, 1000, 100, sf::Color::Magenta));
-	boxes.push_back(l1.createGround(350, 300, 100, 20, sf::Color::Magenta));
+	/*boxes.push_back(l1.createGround(WINDOW_WIDTH / 2, 10, WINDOW_WIDTH, 100, sf::Color::Magenta));
+	boxes.push_back(l1.createGround(WINDOW_WIDTH / 2, WINDOW_HEIGHT-10, WINDOW_WIDTH, 100, sf::Color::Magenta));
+	boxes.push_back(l1.createGround( 10, 300, 100, WINDOW_HEIGHT, sf::Color::Magenta));
+	boxes.push_back(l1.createGround(WINDOW_WIDTH-10, 300, 100, WINDOW_WIDTH, sf::Color::Magenta));
+	boxes.push_back(l1.createGround(450, 300, 175, 20, sf::Color::Magenta));*/
 	
-	auto&& circi = l1.createcircle(440,440,20, 1.f, 0.7f, sf::Color::Red);
-	circles.push_back(circi);
+	//auto&& circi = l1.createcircle(440,440,20, 1.f, 0.7f, sf::Color::Red);
+	//circles.push_back(circi);
+	
 
 	while (w.isOpen())
 	{
@@ -194,8 +226,13 @@ int main()
 		
 		// Render everything
 		
-		l1.render(w, boxes);
-		l1.rendercircle(w, circles);
+		//l1.render(w, boxes);
+		l1.fixedpart(w);
+		l1.rectangledraw(w, 1200, 400, 80, 80, 1.f, 0.7f, sf::Color::Red);
+		l1.drawcircle(w,1200,200,40,1.f,0.7f,sf::Color::Red);
+		l1.drawcircle(w,1200,300,40,1.f,0.7f,sf::Color::Red);
+		
+		//l1.rendercircle(w, circles);
 		w.display();
 
 
