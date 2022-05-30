@@ -1,2 +1,4 @@
 #define PPM 30.0F
 #define DEG_PER_RAD 57.2957795F
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
